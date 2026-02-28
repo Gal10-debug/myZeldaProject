@@ -19,8 +19,8 @@ public class ZeldaGame extends ApplicationAdapter {
         shapeRenderer = new ShapeRenderer();
         gameWorld = new GameWorld();
 
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        camera = new OrthographicCamera(800, 600);
+        camera.position.set(400, 300, 0);
         camera.update();
     }
 
@@ -41,6 +41,21 @@ public class ZeldaGame extends ApplicationAdapter {
             gameWorld.getPlayer().getX(),
             gameWorld.getPlayer().getY(),
             0);
+
+        float halfWidth = camera.viewportWidth / 2f;
+        float halfHeight = camera.viewportHeight / 2f;
+
+        float clampedX = Math.max(
+            halfWidth,
+            Math.min(camera.position.x, gameWorld.getWorldWidth() - halfWidth)
+        );
+
+        float clampedY = Math.max(
+            halfHeight,
+            Math.min(camera.position.y, gameWorld.getWorldHeight() - halfHeight)
+        );
+
+        camera.position.set(clampedX, clampedY, 0);
         camera.update();
 
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);

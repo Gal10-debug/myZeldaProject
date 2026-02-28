@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-public class Player {
+public class Player implements Entity {
 
     private float x;
     private float y;
@@ -15,6 +15,7 @@ public class Player {
         this.y = startY;
     }
 
+    @Override
     public void update(float delta, InputState input) {
 
         if (input.up) {
@@ -31,6 +32,7 @@ public class Player {
         }
     }
 
+    @Override
     public void render(ShapeRenderer renderer) {
         renderer.rect(x, y, 32, 32);
     }
@@ -41,5 +43,10 @@ public class Player {
 
     public float getY() {
         return y;
+    }
+
+    public void clamp(float worldWidth, float worldHeight) {
+        x = Math.max(0, Math.min(x, worldWidth - 32));
+        y = Math.max(0, Math.min(y, worldHeight - 32));
     }
 }
