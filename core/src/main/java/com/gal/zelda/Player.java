@@ -34,4 +34,12 @@ public class Player {
     public void render(ShapeRenderer renderer) {
         renderer.rect(x, y, 32, 32);
     }
+
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
+    }
 }

@@ -5,17 +5,23 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 
 
 public class ZeldaGame extends ApplicationAdapter {
 
     private ShapeRenderer shapeRenderer;
-    private Player player;
+    private GameWorld gameWorld;
+    private OrthographicCamera camera;
 
     @Override
     public void create() {
         shapeRenderer = new ShapeRenderer();
-        player = new Player(100, 100);
+        gameWorld = new GameWorld();
+
+        camera = new OrthographicCamera();
+        camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        camera.update();
     }
 
     @Override
@@ -29,13 +35,20 @@ public class ZeldaGame extends ApplicationAdapter {
         input.left = Gdx.input.isKeyPressed(Input.Keys.A);
         input.right = Gdx.input.isKeyPressed(Input.Keys.D);
 
-        player.update(delta, input);
+        gameWorld.update(delta, input);
+
+        camera.position.set(
+            gameWorld.getPlayer().getX(),
+            gameWorld.getPlayer().getY(),
+            0);
+        camera.update();
 
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        player.render(shapeRenderer);
+        gameWorld.render(shapeRenderer);
         shapeRenderer.end();
     }
 
