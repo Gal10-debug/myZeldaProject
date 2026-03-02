@@ -1,35 +1,15 @@
 package com.gal.zelda;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class Player implements Entity {
 
     private float x;
     private float y;
-    private final float speed = 200f;
 
     public Player(float startX, float startY) {
         this.x = startX;
         this.y = startY;
-    }
-
-    @Override
-    public void update(float delta, InputState input) {
-
-        if (input.up) {
-            y += speed * delta;
-        }
-        if (input.down) {
-            y -= speed * delta;
-        }
-        if (input.left) {
-            x -= speed * delta;
-        }
-        if (input.right) {
-            x += speed * delta;
-        }
     }
 
     @Override
@@ -44,6 +24,9 @@ public class Player implements Entity {
     public float getY() {
         return y;
     }
+
+    public void setX(float x) { this.x = x; }
+    public void setY(float y) { this.y = y; }
 
     public void clamp(float worldWidth, float worldHeight) {
         x = Math.max(0, Math.min(x, worldWidth - 32));
