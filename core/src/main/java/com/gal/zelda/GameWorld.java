@@ -23,15 +23,14 @@ public class GameWorld {
     }
 
     public void update(float delta, InputState input) {
-        movementSystem.update(delta,input,entities);
+        movementSystem.updatePlayer(delta,input,player);
+        player.clamp(worldWidth, worldHeight);
     }
 
     public void render(ShapeRenderer renderer) {
         for (Entity entity : entities) {
             entity.render(renderer);
         }
-
-        player.clamp(worldWidth, worldHeight);
     }
 
     public Player getPlayer() {
