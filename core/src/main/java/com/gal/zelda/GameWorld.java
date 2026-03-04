@@ -1,6 +1,6 @@
 package com.gal.zelda;
 
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class GameWorld {
 
@@ -11,6 +11,7 @@ public class GameWorld {
     private final PlayerInputSystem playerInputSystem;
     private final EnemyChaseSystem enemyChaseSystem;
     private final WorldBoundsSystem worldBoundsSystem;
+    private final WorldTerrainSystem worldTerrainSystem;
     private final RenderSystem renderSystem;
 
     public GameWorld() {
@@ -18,6 +19,7 @@ public class GameWorld {
         playerInputSystem = new PlayerInputSystem();
         enemyChaseSystem = new EnemyChaseSystem();
         worldBoundsSystem = new WorldBoundsSystem();
+        worldTerrainSystem = new WorldTerrainSystem();
         renderSystem = new RenderSystem();
 
         WorldFactory worldFactory = new WorldFactory();
@@ -30,8 +32,14 @@ public class GameWorld {
         worldBoundsSystem.update(worldData, worldWidth, worldHeight);
     }
 
-    public void render(ShapeRenderer renderer) {
-        renderSystem.render(worldData, renderer);
+    public void render(SpriteBatch batch) {
+        worldTerrainSystem.render(batch, worldWidth, worldHeight);
+        renderSystem.render(worldData, batch);
+    }
+
+    public void dispose() {
+        worldTerrainSystem.dispose();
+        renderSystem.dispose();
     }
 
     public float getWorldWidth() {

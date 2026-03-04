@@ -4,20 +4,33 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 
 public class ZeldaGame extends ApplicationAdapter {
 
-    private ShapeRenderer shapeRenderer;
+    private enum GameState {
+        MENU,
+        PLAYING,
+        PAUSED
+    }
+
+    private SpriteBatch spriteBatch;
+    private BitmapFont font;
     private GameWorld gameWorld;
     private OrthographicCamera camera;
+    private MenuSystem menuSystem;
+    private GameState gameState;
 
     @Override
     public void create() {
-        shapeRenderer = new ShapeRenderer();
-        gameWorld = new GameWorld();
+        spriteBatch = new SpriteBatch();
+        font = new BitmapFont();
+        menuSystem = new MenuSystem();
+        gameState = GameState.MENU;
+        menuSystem.resetMain();
 
         camera = new OrthographicCamera(800, 600);
         camera.position.set(400, 300, 0);
@@ -29,26 +42,81 @@ public class ZeldaGame extends ApplicationAdapter {
 
         float delta = Gdx.graphics.getDeltaTime();
 
+        if (gameState == GameState.MENU) {
+            handleMainMenuInput();
+        } else if (gameState == GameState.PLAYING) {
+            handlePlayingInput(delta);
+        } else if (gameState == GameState.PAUSED) {
+            handlePauseMenuInput();
+        }
+
+        Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        spriteBatch.setProjectionMatrix(camera.combined);
+        spriteBatch.begin();
+        if (gameState == GameState.PLAYING || gameState == GameState.PAUSED) {
+            gameWorld.render(spriteBatch);
+        }
+        if (gameState == GameState.MENU) {
+            menuSystem.draw(spriteBatch, font, MenuSystem.Screen.MAIN);
+        } else if (gameState == GameState.PAUSED) {
+            menuSystem.draw(spriteBatch, font, MenuSystem.Screen.PAUSE);
+        }
+        spriteBatch.end();
+    }
+
+    @Override
+    public void dispose() {
+        if (gameWorld != null) {
+            gameWorld.dispose();
+        }
+        font.dispose();
+        spriteBatch.dispose();
+    }
+
+    private void startNewGame() {
+        if (gameWorld != null) {
+            gameWorld.dispose();
+        }
+        gameWorld = new GameWorld();
+        gameState = GameState.PLAYING;
+        menuSystem.resetPause();
+    }
+
+    private void handleMainMenuInput() {
+        MenuSystem.Action action = menuSystem.update(MenuSystem.Screen.MAIN);
+        if (action == MenuSystem.Action.START_NEW_GAME) {
+            startNewGame();
+        } else if (action == MenuSystem.Action.CLOSE_GAME) {
+            Gdx.app.exit();
+        }
+    }
+
+    private void handlePlayingInput(float delta) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            gameState = GameState.PAUSED;
+            menuSystem.resetPause();
+            return;
+        }
+
         InputState input = new InputState();
         input.up = Gdx.input.isKeyPressed(Input.Keys.W);
         input.down = Gdx.input.isKeyPressed(Input.Keys.S);
         input.left = Gdx.input.isKeyPressed(Input.Keys.A);
         input.right = Gdx.input.isKeyPressed(Input.Keys.D);
-
         gameWorld.update(delta, input);
-        camera.update();
-
-        Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        shapeRenderer.setProjectionMatrix(camera.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        gameWorld.render(shapeRenderer);
-        shapeRenderer.end();
     }
 
-    @Override
-    public void dispose() {
-        shapeRenderer.dispose();
+    private void handlePauseMenuInput() {
+        MenuSystem.Action action = menuSystem.update(MenuSystem.Screen.PAUSE);
+        if (action == MenuSystem.Action.CONTINUE_GAME) {
+            gameState = GameState.PLAYING;
+        } else if (action == MenuSystem.Action.QUIT_TO_MENU) {
+            gameState = GameState.MENU;
+            menuSystem.resetMain();
+        } else if (action == MenuSystem.Action.CLOSE_GAME) {
+            Gdx.app.exit();
+        }
     }
 }
