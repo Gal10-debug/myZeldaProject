@@ -2,39 +2,36 @@ package com.gal.zelda;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class GameWorld {
 
-    private final Player player;
-    private final List<Entity> entities;
-    private MovementSystem movementSystem;
     private final float worldWidth = 2000;
     private final float worldHeight = 2000;
 
+    private final WorldData worldData;
+    private final PlayerInputSystem playerInputSystem;
+    private final EnemyChaseSystem enemyChaseSystem;
+    private final WorldBoundsSystem worldBoundsSystem;
+    private final RenderSystem renderSystem;
+
     public GameWorld() {
-        entities = new ArrayList<>();
-        movementSystem = new MovementSystem();
-        player = new Player(100, 100);
-        entities.add(player);
-        Enemy enemy = new Enemy(400, 400);
-        entities.add(enemy);
+        worldData = new WorldData();
+        playerInputSystem = new PlayerInputSystem();
+        enemyChaseSystem = new EnemyChaseSystem();
+        worldBoundsSystem = new WorldBoundsSystem();
+        renderSystem = new RenderSystem();
+
+        WorldFactory worldFactory = new WorldFactory();
+        worldFactory.createDefaultWorld(worldData);
     }
 
     public void update(float delta, InputState input) {
-        movementSystem.updatePlayer(delta,input,player);
-        player.clamp(worldWidth, worldHeight);
+        playerInputSystem.update(worldData, delta, input);
+        enemyChaseSystem.update(worldData, delta);
+        worldBoundsSystem.update(worldData, worldWidth, worldHeight);
     }
 
     public void render(ShapeRenderer renderer) {
-        for (Entity entity : entities) {
-            entity.render(renderer);
-        }
-    }
-
-    public Player getPlayer() {
-        return player;
+        renderSystem.render(worldData, renderer);
     }
 
     public float getWorldWidth() {
