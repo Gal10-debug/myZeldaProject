@@ -13,6 +13,8 @@ public class WorldData {
     public final Map<Integer, SpeedComponent> speeds = new HashMap<>();
     public final Map<Integer, RenderComponent> renderables = new HashMap<>();
     public final Map<Integer, SpriteComponent> sprites = new HashMap<>();
+    public final Map<Integer, FacingComponent> facings = new HashMap<>();
+    public final Map<Integer, AnimationStateComponent> animationStates = new HashMap<>();
     public final Map<Integer, HealthComponent> health = new HashMap<>();
     public final Map<Integer, AttackComponent> attacks = new HashMap<>();
     public final Map<Integer, ContactDamageComponent> contactDamage = new HashMap<>();

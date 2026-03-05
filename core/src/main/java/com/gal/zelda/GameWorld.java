@@ -11,6 +11,7 @@ public class GameWorld {
     private final PlayerInputSystem playerInputSystem;
     private final EnemyChaseSystem enemyChaseSystem;
     private final WorldBoundsSystem worldBoundsSystem;
+    private final AnimationStateSystem animationStateSystem;
     private final PlayerAttackSystem playerAttackSystem;
     private final EnemyContactDamageSystem enemyContactDamageSystem;
     private final EnemyRespawnSystem enemyRespawnSystem;
@@ -22,6 +23,7 @@ public class GameWorld {
         playerInputSystem = new PlayerInputSystem();
         enemyChaseSystem = new EnemyChaseSystem();
         worldBoundsSystem = new WorldBoundsSystem();
+        animationStateSystem = new AnimationStateSystem();
         playerAttackSystem = new PlayerAttackSystem();
         enemyContactDamageSystem = new EnemyContactDamageSystem();
         enemyRespawnSystem = new EnemyRespawnSystem();
@@ -39,6 +41,7 @@ public class GameWorld {
         enemyContactDamageSystem.update(worldData, delta);
         enemyRespawnSystem.update(worldData, delta);
         worldBoundsSystem.update(worldData, worldWidth, worldHeight);
+        animationStateSystem.update(worldData, delta);
     }
 
     public void render(SpriteBatch batch) {

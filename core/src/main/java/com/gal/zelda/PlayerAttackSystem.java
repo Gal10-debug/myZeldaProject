@@ -5,11 +5,13 @@ public class PlayerAttackSystem {
         for (int player : world.players) {
             AttackComponent attack = world.attacks.get(player);
             PositionComponent playerPosition = world.positions.get(player);
+            AnimationStateComponent animation = world.animationStates.get(player);
             if (attack == null || playerPosition == null) {
                 continue;
             }
 
             attack.cooldownRemaining = Math.max(0f, attack.cooldownRemaining - delta);
+            attack.attackAnimationRemaining = Math.max(0f, attack.attackAnimationRemaining - delta);
             if (!input.attackPressed || attack.cooldownRemaining > 0f) {
                 continue;
             }
@@ -23,6 +25,10 @@ public class PlayerAttackSystem {
             }
 
             attack.cooldownRemaining = attack.cooldownSeconds;
+            attack.attackAnimationRemaining = attack.attackAnimationDuration;
+            if (animation != null) {
+                setState(animation, ActorState.ATTACKING);
+            }
         }
     }
 
@@ -47,5 +53,12 @@ public class PlayerAttackSystem {
         }
 
         return nearestEnemy;
+    }
+
+    private void setState(AnimationStateComponent animation, ActorState newState) {
+        if (animation.state != newState) {
+            animation.state = newState;
+            animation.stateTime = 0f;
+        }
     }
 }

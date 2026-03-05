@@ -24,16 +24,48 @@ public class RenderSystem {
             PositionComponent position = world.positions.get(entity);
             RenderComponent render = world.renderables.get(entity);
             SpriteComponent sprite = entry.getValue();
+            AnimationStateComponent animation = world.animationStates.get(entity);
+            FacingComponent facing = world.facings.get(entity);
+            AttackComponent attack = world.attacks.get(entity);
             if (position == null || render == null) {
                 continue;
             }
 
+            float drawX = position.x;
+            float drawY = position.y;
+            float drawWidth = render.width;
+            float drawHeight = render.height;
+
+            if (animation != null) {
+                if (animation.state == ActorState.WALKING) {
+                    float bob = Math.abs((float) Math.sin(animation.stateTime * 10f)) * 3f;
+                    drawY += bob;
+                } else if (animation.state == ActorState.ATTACKING) {
+                    float progress = 0f;
+                    if (attack != null && attack.attackAnimationDuration > 0f) {
+                        progress = 1f - (attack.attackAnimationRemaining / attack.attackAnimationDuration);
+                    }
+                    float lunge = (float) Math.sin(progress * Math.PI) * 8f;
+                    if (facing != null) {
+                        drawX += facing.x * lunge;
+                        drawY += facing.y * lunge;
+                    }
+                    drawWidth = render.width * 1.05f;
+                    drawHeight = render.height * 1.05f;
+                    batch.setColor(1f, 0.88f, 0.88f, 1f);
+                } else {
+                    batch.setColor(1f, 1f, 1f, 1f);
+                }
+            } else {
+                batch.setColor(1f, 1f, 1f, 1f);
+            }
+
             batch.draw(
                 spriteSheet,
-                position.x,
-                position.y,
-                render.width,
-                render.height,
+                drawX,
+                drawY,
+                drawWidth,
+                drawHeight,
                 sprite.srcX,
                 sprite.srcY,
                 sprite.srcWidth,
@@ -41,6 +73,7 @@ public class RenderSystem {
                 false,
                 false
             );
+            batch.setColor(1f, 1f, 1f, 1f);
         }
     }
 

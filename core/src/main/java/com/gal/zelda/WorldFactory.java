@@ -13,6 +13,8 @@ public class WorldFactory {
         world.speeds.put(playerEntity, new SpeedComponent(200f));
         world.renderables.put(playerEntity, new RenderComponent(32f, 32f, 1f, 1f, 1f, 1f));
         world.sprites.put(playerEntity, new SpriteComponent(PLAYER_COL_X, LAST_PAIR_ROW_Y, TILE_SIZE, TILE_SIZE));
+        world.facings.put(playerEntity, new FacingComponent(1f, 0f));
+        world.animationStates.put(playerEntity, new AnimationStateComponent(ActorState.IDLE));
         world.playerControlled.add(playerEntity);
         world.players.add(playerEntity);
         world.health.put(playerEntity, new HealthComponent(10));
@@ -25,6 +27,8 @@ public class WorldFactory {
         world.speeds.put(enemyEntity, new SpeedComponent(120f));
         world.renderables.put(enemyEntity, new RenderComponent(32f, 32f, 1f, 1f, 1f, 1f));
         world.sprites.put(enemyEntity, new SpriteComponent(ENEMY_COL_X, LAST_PAIR_ROW_Y, TILE_SIZE, TILE_SIZE));
+        world.facings.put(enemyEntity, new FacingComponent(-1f, 0f));
+        world.animationStates.put(enemyEntity, new AnimationStateComponent(ActorState.IDLE));
         world.enemies.add(enemyEntity);
         world.health.put(enemyEntity, new HealthComponent(6));
         world.contactDamage.put(enemyEntity, new ContactDamageComponent(1));
