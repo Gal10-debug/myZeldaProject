@@ -22,10 +22,13 @@ public class ZeldaGame extends ApplicationAdapter {
     private SpriteBatch spriteBatch;
     private BitmapFont font;
     private GameWorld gameWorld;
-    private OrthographicCamera camera;
+    private OrthographicCamera worldCamera;
+    private OrthographicCamera uiCamera;
     private MenuSystem menuSystem;
     private GameState gameState;
     private static final int KILL_TARGET = 10;
+    private static final float VIEWPORT_WIDTH = 800f;
+    private static final float VIEWPORT_HEIGHT = 600f;
 
     @Override
     public void create() {
@@ -35,9 +38,13 @@ public class ZeldaGame extends ApplicationAdapter {
         gameState = GameState.MENU;
         menuSystem.resetMain();
 
-        camera = new OrthographicCamera(800, 600);
-        camera.position.set(400, 300, 0);
-        camera.update();
+        worldCamera = new OrthographicCamera(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
+        worldCamera.position.set(VIEWPORT_WIDTH / 2f, VIEWPORT_HEIGHT / 2f, 0);
+        worldCamera.update();
+
+        uiCamera = new OrthographicCamera(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
+        uiCamera.position.set(VIEWPORT_WIDTH / 2f, VIEWPORT_HEIGHT / 2f, 0);
+        uiCamera.update();
     }
 
     @Override
@@ -60,10 +67,17 @@ public class ZeldaGame extends ApplicationAdapter {
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        spriteBatch.setProjectionMatrix(camera.combined);
+        if (gameState == GameState.PLAYING || gameState == GameState.PAUSED || gameState == GameState.GAME_OVER || gameState == GameState.VICTORY) {
+            updateWorldCameraFollow();
+            spriteBatch.setProjectionMatrix(worldCamera.combined);
+            spriteBatch.begin();
+            gameWorld.render(spriteBatch);
+            spriteBatch.end();
+        }
+
+        spriteBatch.setProjectionMatrix(uiCamera.combined);
         spriteBatch.begin();
         if (gameState == GameState.PLAYING || gameState == GameState.PAUSED || gameState == GameState.GAME_OVER || gameState == GameState.VICTORY) {
-            gameWorld.render(spriteBatch);
             drawHud();
         }
         if (gameState == GameState.MENU) {
@@ -143,10 +157,13 @@ public class ZeldaGame extends ApplicationAdapter {
         int playerMaxHealth = gameWorld.getPlayerMaxHealth();
         int enemyHealth = gameWorld.getEnemyHealth();
         int kills = gameWorld.getEnemyKills();
+        int playerDamage = gameWorld.getPlayerDamage();
         font.draw(spriteBatch, "HP: " + playerHealth + "/" + playerMaxHealth, 20f, 580f);
         font.draw(spriteBatch, "Enemy HP: " + enemyHealth, 20f, 555f);
         font.draw(spriteBatch, "Kills: " + kills + "/" + KILL_TARGET, 20f, 530f);
-        font.draw(spriteBatch, "Attack: SPACE", 20f, 505f);
+        font.draw(spriteBatch, "Damage: " + playerDamage, 20f, 505f);
+        font.draw(spriteBatch, "Attack: SPACE", 20f, 480f);
+        font.draw(spriteBatch, "Green: +HP, Orange: +DMG", 20f, 455f);
     }
 
     private void handleGameOverInput() {
@@ -182,5 +199,22 @@ public class ZeldaGame extends ApplicationAdapter {
         font.draw(spriteBatch, "You defeated " + KILL_TARGET + " enemies.", x, y - 30f);
         font.draw(spriteBatch, "Press ENTER to start a new game", x, y - 55f);
         font.draw(spriteBatch, "Press ESC to return to menu", x, y - 80f);
+    }
+
+    private void updateWorldCameraFollow() {
+        if (gameWorld == null) {
+            return;
+        }
+
+        float playerX = gameWorld.getPlayerX();
+        float playerY = gameWorld.getPlayerY();
+        float halfWidth = worldCamera.viewportWidth / 2f;
+        float halfHeight = worldCamera.viewportHeight / 2f;
+
+        float clampedX = Math.max(halfWidth, Math.min(playerX, gameWorld.getWorldWidth() - halfWidth));
+        float clampedY = Math.max(halfHeight, Math.min(playerY, gameWorld.getWorldHeight() - halfHeight));
+
+        worldCamera.position.set(clampedX, clampedY, 0f);
+        worldCamera.update();
     }
 }
