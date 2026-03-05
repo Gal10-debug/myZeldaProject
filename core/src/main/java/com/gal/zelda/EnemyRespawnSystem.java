@@ -19,6 +19,7 @@ public class EnemyRespawnSystem {
             if (!respawn.waitingForRespawn) {
                 respawn.waitingForRespawn = true;
                 respawn.remainingSeconds = respawn.delaySeconds;
+                world.enemyKills++;
             } else {
                 respawn.remainingSeconds -= delta;
             }

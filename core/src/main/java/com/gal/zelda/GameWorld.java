@@ -88,4 +88,8 @@ public class GameWorld {
         }
         return 0;
     }
+
+    public int getEnemyKills() {
+        return worldData.enemyKills;
+    }
 }

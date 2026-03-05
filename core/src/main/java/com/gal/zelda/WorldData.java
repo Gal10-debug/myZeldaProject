@@ -7,6 +7,7 @@ import java.util.Set;
 
 public class WorldData {
     private int nextEntityId = 1;
+    public int enemyKills = 0;
 
     public final Map<Integer, PositionComponent> positions = new HashMap<>();
     public final Map<Integer, SpeedComponent> speeds = new HashMap<>();
