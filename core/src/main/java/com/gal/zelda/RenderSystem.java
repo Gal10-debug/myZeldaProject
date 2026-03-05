@@ -16,6 +16,11 @@ public class RenderSystem {
     public void render(WorldData world, SpriteBatch batch) {
         for (Map.Entry<Integer, SpriteComponent> entry : world.sprites.entrySet()) {
             int entity = entry.getKey();
+            HealthComponent health = world.health.get(entity);
+            if (world.enemies.contains(entity) && health != null && health.current <= 0) {
+                continue;
+            }
+
             PositionComponent position = world.positions.get(entity);
             RenderComponent render = world.renderables.get(entity);
             SpriteComponent sprite = entry.getValue();

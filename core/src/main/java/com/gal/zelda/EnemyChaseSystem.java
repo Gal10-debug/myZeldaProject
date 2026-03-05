@@ -7,6 +7,10 @@ public class EnemyChaseSystem {
         for (Map.Entry<Integer, Integer> chase : world.chaseTargets.entrySet()) {
             int enemy = chase.getKey();
             int target = chase.getValue();
+            HealthComponent enemyHealth = world.health.get(enemy);
+            if (enemyHealth != null && enemyHealth.current <= 0) {
+                continue;
+            }
 
             PositionComponent enemyPos = world.positions.get(enemy);
             PositionComponent targetPos = world.positions.get(target);

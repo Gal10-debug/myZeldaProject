@@ -57,6 +57,7 @@ public class ZeldaGame extends ApplicationAdapter {
         spriteBatch.begin();
         if (gameState == GameState.PLAYING || gameState == GameState.PAUSED) {
             gameWorld.render(spriteBatch);
+            drawHud();
         }
         if (gameState == GameState.MENU) {
             menuSystem.draw(spriteBatch, font, MenuSystem.Screen.MAIN);
@@ -105,6 +106,7 @@ public class ZeldaGame extends ApplicationAdapter {
         input.down = Gdx.input.isKeyPressed(Input.Keys.S);
         input.left = Gdx.input.isKeyPressed(Input.Keys.A);
         input.right = Gdx.input.isKeyPressed(Input.Keys.D);
+        input.attackPressed = Gdx.input.isKeyJustPressed(Input.Keys.SPACE);
         gameWorld.update(delta, input);
     }
 
@@ -118,5 +120,14 @@ public class ZeldaGame extends ApplicationAdapter {
         } else if (action == MenuSystem.Action.CLOSE_GAME) {
             Gdx.app.exit();
         }
+    }
+
+    private void drawHud() {
+        int playerHealth = gameWorld.getPlayerHealth();
+        int playerMaxHealth = gameWorld.getPlayerMaxHealth();
+        int enemyHealth = gameWorld.getEnemyHealth();
+        font.draw(spriteBatch, "HP: " + playerHealth + "/" + playerMaxHealth, 20f, 580f);
+        font.draw(spriteBatch, "Enemy HP: " + enemyHealth, 20f, 555f);
+        font.draw(spriteBatch, "Attack: SPACE", 20f, 530f);
     }
 }

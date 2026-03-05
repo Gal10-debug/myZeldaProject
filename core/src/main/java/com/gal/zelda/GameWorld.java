@@ -11,6 +11,9 @@ public class GameWorld {
     private final PlayerInputSystem playerInputSystem;
     private final EnemyChaseSystem enemyChaseSystem;
     private final WorldBoundsSystem worldBoundsSystem;
+    private final PlayerAttackSystem playerAttackSystem;
+    private final EnemyContactDamageSystem enemyContactDamageSystem;
+    private final EnemyRespawnSystem enemyRespawnSystem;
     private final WorldTerrainSystem worldTerrainSystem;
     private final RenderSystem renderSystem;
 
@@ -19,6 +22,9 @@ public class GameWorld {
         playerInputSystem = new PlayerInputSystem();
         enemyChaseSystem = new EnemyChaseSystem();
         worldBoundsSystem = new WorldBoundsSystem();
+        playerAttackSystem = new PlayerAttackSystem();
+        enemyContactDamageSystem = new EnemyContactDamageSystem();
+        enemyRespawnSystem = new EnemyRespawnSystem();
         worldTerrainSystem = new WorldTerrainSystem();
         renderSystem = new RenderSystem();
 
@@ -29,6 +35,9 @@ public class GameWorld {
     public void update(float delta, InputState input) {
         playerInputSystem.update(worldData, delta, input);
         enemyChaseSystem.update(worldData, delta);
+        playerAttackSystem.update(worldData, delta, input);
+        enemyContactDamageSystem.update(worldData, delta);
+        enemyRespawnSystem.update(worldData, delta);
         worldBoundsSystem.update(worldData, worldWidth, worldHeight);
     }
 
@@ -48,5 +57,35 @@ public class GameWorld {
 
     public float getWorldHeight() {
         return worldHeight;
+    }
+
+    public int getPlayerHealth() {
+        for (int player : worldData.players) {
+            HealthComponent health = worldData.health.get(player);
+            if (health != null) {
+                return health.current;
+            }
+        }
+        return 0;
+    }
+
+    public int getPlayerMaxHealth() {
+        for (int player : worldData.players) {
+            HealthComponent health = worldData.health.get(player);
+            if (health != null) {
+                return health.max;
+            }
+        }
+        return 0;
+    }
+
+    public int getEnemyHealth() {
+        for (int enemy : worldData.enemies) {
+            HealthComponent health = worldData.health.get(enemy);
+            if (health != null) {
+                return health.current;
+            }
+        }
+        return 0;
     }
 }

@@ -14,6 +14,10 @@ public class WorldFactory {
         world.renderables.put(playerEntity, new RenderComponent(32f, 32f, 1f, 1f, 1f, 1f));
         world.sprites.put(playerEntity, new SpriteComponent(PLAYER_COL_X, LAST_PAIR_ROW_Y, TILE_SIZE, TILE_SIZE));
         world.playerControlled.add(playerEntity);
+        world.players.add(playerEntity);
+        world.health.put(playerEntity, new HealthComponent(10));
+        world.attacks.put(playerEntity, new AttackComponent(2, 60f, 0.35f));
+        world.hurtCooldowns.put(playerEntity, new HurtCooldownComponent(0.6f));
         world.worldBounded.add(playerEntity);
 
         int enemyEntity = world.createEntity();
@@ -21,6 +25,10 @@ public class WorldFactory {
         world.speeds.put(enemyEntity, new SpeedComponent(120f));
         world.renderables.put(enemyEntity, new RenderComponent(32f, 32f, 1f, 1f, 1f, 1f));
         world.sprites.put(enemyEntity, new SpriteComponent(ENEMY_COL_X, LAST_PAIR_ROW_Y, TILE_SIZE, TILE_SIZE));
+        world.enemies.add(enemyEntity);
+        world.health.put(enemyEntity, new HealthComponent(6));
+        world.contactDamage.put(enemyEntity, new ContactDamageComponent(1));
+        world.respawns.put(enemyEntity, new RespawnComponent(400f, 400f, 2f));
         world.chaseTargets.put(enemyEntity, playerEntity);
         world.worldBounded.add(enemyEntity);
     }
