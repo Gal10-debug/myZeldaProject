@@ -6,5 +6,6 @@ public class InputState {
     public boolean down;
     public boolean left;
     public boolean right;
+    public boolean attackPressed;
 
 }
