@@ -14,7 +14,8 @@ public class ZeldaGame extends ApplicationAdapter {
     private enum GameState {
         MENU,
         PLAYING,
-        PAUSED
+        PAUSED,
+        GAME_OVER
     }
 
     private SpriteBatch spriteBatch;
@@ -48,6 +49,8 @@ public class ZeldaGame extends ApplicationAdapter {
             handlePlayingInput(delta);
         } else if (gameState == GameState.PAUSED) {
             handlePauseMenuInput();
+        } else if (gameState == GameState.GAME_OVER) {
+            handleGameOverInput();
         }
 
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
@@ -55,7 +58,7 @@ public class ZeldaGame extends ApplicationAdapter {
 
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
-        if (gameState == GameState.PLAYING || gameState == GameState.PAUSED) {
+        if (gameState == GameState.PLAYING || gameState == GameState.PAUSED || gameState == GameState.GAME_OVER) {
             gameWorld.render(spriteBatch);
             drawHud();
         }
@@ -63,6 +66,8 @@ public class ZeldaGame extends ApplicationAdapter {
             menuSystem.draw(spriteBatch, font, MenuSystem.Screen.MAIN);
         } else if (gameState == GameState.PAUSED) {
             menuSystem.draw(spriteBatch, font, MenuSystem.Screen.PAUSE);
+        } else if (gameState == GameState.GAME_OVER) {
+            drawGameOver();
         }
         spriteBatch.end();
     }
@@ -108,6 +113,9 @@ public class ZeldaGame extends ApplicationAdapter {
         input.right = Gdx.input.isKeyPressed(Input.Keys.D);
         input.attackPressed = Gdx.input.isKeyJustPressed(Input.Keys.SPACE);
         gameWorld.update(delta, input);
+        if (gameWorld.getPlayerHealth() <= 0) {
+            gameState = GameState.GAME_OVER;
+        }
     }
 
     private void handlePauseMenuInput() {
@@ -129,5 +137,22 @@ public class ZeldaGame extends ApplicationAdapter {
         font.draw(spriteBatch, "HP: " + playerHealth + "/" + playerMaxHealth, 20f, 580f);
         font.draw(spriteBatch, "Enemy HP: " + enemyHealth, 20f, 555f);
         font.draw(spriteBatch, "Attack: SPACE", 20f, 530f);
+    }
+
+    private void handleGameOverInput() {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            startNewGame();
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            gameState = GameState.MENU;
+            menuSystem.resetMain();
+        }
+    }
+
+    private void drawGameOver() {
+        float x = 280f;
+        float y = 360f;
+        font.draw(spriteBatch, "Game Over", x, y);
+        font.draw(spriteBatch, "Press ENTER to start a new game", x, y - 30f);
+        font.draw(spriteBatch, "Press ESC to return to menu", x, y - 55f);
     }
 }
