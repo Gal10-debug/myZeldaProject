@@ -163,7 +163,7 @@ public class ZeldaGame extends ApplicationAdapter {
         font.draw(spriteBatch, "Kills: " + kills + "/" + KILL_TARGET, 20f, 530f);
         font.draw(spriteBatch, "Damage: " + playerDamage, 20f, 505f);
         font.draw(spriteBatch, "Attack: SPACE", 20f, 480f);
-        font.draw(spriteBatch, "Green: +HP, Orange: +DMG", 20f, 455f);
+        font.draw(spriteBatch, "Heart: +HP, Sword: +DMG", 20f, 455f);
     }
 
     private void handleGameOverInput() {
