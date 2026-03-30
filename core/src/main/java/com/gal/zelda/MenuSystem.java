@@ -70,6 +70,7 @@ public class MenuSystem {
                 y -= 30f;
             }
             font.draw(batch, "Use W/S (or arrows) and Enter", x, y - 20f);
+            font.draw(batch, "Press T to test backend connection", x, y - 45f);
             return;
         }
 

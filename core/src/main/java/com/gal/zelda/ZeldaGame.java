@@ -25,7 +25,10 @@ public class ZeldaGame extends ApplicationAdapter {
     private OrthographicCamera worldCamera;
     private OrthographicCamera uiCamera;
     private MenuSystem menuSystem;
+    private BackendClient backendClient;
     private GameState gameState;
+    private String backendStatus;
+    private PlayerProfile loadedPlayer;
     private static final int KILL_TARGET = 10;
     private static final float VIEWPORT_WIDTH = 800f;
     private static final float VIEWPORT_HEIGHT = 600f;
@@ -35,7 +38,10 @@ public class ZeldaGame extends ApplicationAdapter {
         spriteBatch = new SpriteBatch();
         font = new BitmapFont();
         menuSystem = new MenuSystem();
+        backendClient = new BackendClient(BackendConfig.BASE_URL);
         gameState = GameState.MENU;
+        backendStatus = "Press T to test server connection";
+        loadedPlayer = null;
         menuSystem.resetMain();
 
         worldCamera = new OrthographicCamera(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
@@ -82,6 +88,7 @@ public class ZeldaGame extends ApplicationAdapter {
         }
         if (gameState == GameState.MENU) {
             menuSystem.draw(spriteBatch, font, MenuSystem.Screen.MAIN);
+            drawBackendStatus();
         } else if (gameState == GameState.PAUSED) {
             menuSystem.draw(spriteBatch, font, MenuSystem.Screen.PAUSE);
         } else if (gameState == GameState.GAME_OVER) {
@@ -111,6 +118,10 @@ public class ZeldaGame extends ApplicationAdapter {
     }
 
     private void handleMainMenuInput() {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
+            testBackendConnection();
+        }
+
         MenuSystem.Action action = menuSystem.update(MenuSystem.Screen.MAIN);
         if (action == MenuSystem.Action.START_NEW_GAME) {
             startNewGame();
@@ -164,6 +175,35 @@ public class ZeldaGame extends ApplicationAdapter {
         font.draw(spriteBatch, "Damage: " + playerDamage, 20f, 505f);
         font.draw(spriteBatch, "Attack: SPACE", 20f, 480f);
         font.draw(spriteBatch, "Heart: +HP, Sword: +DMG", 20f, 455f);
+    }
+
+    private void drawBackendStatus() {
+        font.draw(spriteBatch, backendStatus, 40f, 120f);
+        font.draw(spriteBatch, "Configured URL: " + BackendConfig.BASE_URL, 40f, 95f);
+        font.draw(spriteBatch, "Expected test endpoint: GET /api/players/1", 40f, 70f);
+        if (loadedPlayer != null) {
+            font.draw(spriteBatch, "Player ID: " + loadedPlayer.id, 40f, 45f);
+            font.draw(spriteBatch, "Username: " + loadedPlayer.username, 220f, 45f);
+            font.draw(spriteBatch, "Total Score: " + loadedPlayer.totalScore, 40f, 20f);
+            font.draw(spriteBatch, "Total Kills: " + loadedPlayer.totalKills, 220f, 20f);
+        }
+    }
+
+    private void testBackendConnection() {
+        loadedPlayer = null;
+        backendStatus = "Connecting to " + BackendConfig.BASE_URL + "/api/players/1 ...";
+        backendClient.fetchPlayerById(1, new BackendClient.ResponseHandler() {
+            @Override
+            public void onSuccess(PlayerProfile playerProfile) {
+                loadedPlayer = playerProfile;
+                backendStatus = "Connected. Player loaded successfully";
+            }
+
+            @Override
+            public void onFailure(String errorMessage) {
+                backendStatus = "Connection failed: " + errorMessage;
+            }
+        });
     }
 
     private void handleGameOverInput() {
